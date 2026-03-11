@@ -36,7 +36,7 @@ export class Customer {
    * PII Vault token referencing the customer's phone.
    * Raw phone is never stored in this database.
    */
-  @Column({ name: 'phone_token', length: 64, nullable: true })
+  @Column({ type: 'varchar', name: 'phone_token', length: 64, nullable: true })
   phoneToken!: string | null;
 
   /** Organization this customer belongs to (short hash, e.g. O-92AF) */

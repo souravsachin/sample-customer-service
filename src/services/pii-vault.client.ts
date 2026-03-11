@@ -26,17 +26,25 @@ export class PiiVaultClient {
    * Tokenize a PII value.
    * @param dataType - Type of PII data (e.g. 'email', 'phone')
    * @param value - Raw PII value to tokenize
+   * @param organizationHashId - Organization context
+   * @param bearerToken - JWT token to forward for authentication
    * @returns PII token (e.g. 'PII-92AF')
    */
-  async tokenize(dataType: string, value: string): Promise<string> {
+  async tokenize(
+    dataType: string,
+    value: string,
+    organizationHashId: string,
+    bearerToken: string,
+  ): Promise<string> {
     try {
-      const response = await this.httpClient.post('/api/v1/G/pii/tokenize', {
-        dataType,
-        value,
-      });
+      const response = await this.httpClient.post(
+        '/api/v1/G/pii/tokenize',
+        { dataType, value, organizationHashId },
+        { headers: { Authorization: `Bearer ${bearerToken}` } },
+      );
       return response.data.token;
     } catch (error) {
-      this.logger.error(`Failed to tokenize ${dataType}`, error);
+      this.logger.error(`Failed to tokenize ${dataType}`, (error as Error)?.message || error);
       throw error;
     }
   }
@@ -44,16 +52,19 @@ export class PiiVaultClient {
   /**
    * Detokenize a PII token back to the raw value.
    * @param token - PII token (e.g. 'PII-92AF')
+   * @param bearerToken - JWT token to forward for authentication
    * @returns Raw PII value
    */
-  async detokenize(token: string): Promise<string> {
+  async detokenize(token: string, bearerToken: string): Promise<string> {
     try {
-      const response = await this.httpClient.post('/api/v1/G/pii/detokenize', {
-        token,
-      });
+      const response = await this.httpClient.post(
+        '/api/v1/G/pii/detokenize',
+        { token },
+        { headers: { Authorization: `Bearer ${bearerToken}` } },
+      );
       return response.data.value;
     } catch (error) {
-      this.logger.error(`Failed to detokenize token ${token}`, error);
+      this.logger.error(`Failed to detokenize token ${token}`, (error as Error)?.message || error);
       throw error;
     }
   }

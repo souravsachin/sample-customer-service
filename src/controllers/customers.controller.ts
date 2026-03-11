@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
   Req,
+  Headers,
 } from '@nestjs/common';
 import { CustomersService } from '../services/customers.service';
 import { CreateCustomerDto } from '../models/dto/create-customer.dto';
@@ -20,6 +21,15 @@ import { NamespaceGuard } from '../middleware/namespace.guard';
 import { JwtPayload } from '../middleware/jwt.strategy';
 
 /**
+ * Extract raw bearer token from Authorization header.
+ */
+function extractToken(authHeader?: string): string {
+  if (!authHeader) return '';
+  const parts = authHeader.split(' ');
+  return parts.length === 2 ? parts[1] : '';
+}
+
+/**
  * Customer management endpoints, scoped to an organization namespace.
  * All routes enforce JWT authentication and namespace isolation via orgId.
  */
@@ -28,63 +38,42 @@ import { JwtPayload } from '../middleware/jwt.strategy';
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
-  /**
-   * GET /api/v1/O/:orgId/customers
-   * List all customers in an organization.
-   */
   @Get()
   async findAll(@Param('orgId') orgId: string): Promise<CustomerResponseDto[]> {
     return this.customersService.findAll(orgId);
   }
 
-  /**
-   * POST /api/v1/O/:orgId/customers
-   * Create a new customer in an organization.
-   * Raw PII (email, phone) is tokenized via PII Vault before storage.
-   */
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(
     @Param('orgId') orgId: string,
     @Body() dto: CreateCustomerDto,
+    @Headers('authorization') authHeader: string,
   ): Promise<CustomerResponseDto> {
-    return this.customersService.create(orgId, dto);
+    return this.customersService.create(orgId, dto, extractToken(authHeader));
   }
 
-  /**
-   * GET /api/v1/O/:orgId/customers/:customerId
-   * Get a single customer by hashId within an organization.
-   * PII fields (email, phone) are only returned if the caller has
-   * the pii:detokenize privilege in their JWT.
-   */
   @Get(':customerId')
   async findOne(
     @Param('orgId') orgId: string,
     @Param('customerId') customerId: string,
     @Req() req: { user: JwtPayload },
+    @Headers('authorization') authHeader: string,
   ): Promise<CustomerResponseDto> {
     const canDetokenize = req.user.privileges?.includes('pii:detokenize') ?? false;
-    return this.customersService.findOne(orgId, customerId, canDetokenize);
+    return this.customersService.findOne(orgId, customerId, canDetokenize, extractToken(authHeader));
   }
 
-  /**
-   * PUT /api/v1/O/:orgId/customers/:customerId
-   * Update a customer within an organization.
-   * Changed PII fields are re-tokenized via PII Vault.
-   */
   @Put(':customerId')
   async update(
     @Param('orgId') orgId: string,
     @Param('customerId') customerId: string,
     @Body() dto: UpdateCustomerDto,
+    @Headers('authorization') authHeader: string,
   ): Promise<CustomerResponseDto> {
-    return this.customersService.update(orgId, customerId, dto);
+    return this.customersService.update(orgId, customerId, dto, extractToken(authHeader));
   }
 
-  /**
-   * DELETE /api/v1/O/:orgId/customers/:customerId
-   * Delete a customer within an organization.
-   */
   @Delete(':customerId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(

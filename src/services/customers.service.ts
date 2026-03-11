@@ -54,6 +54,7 @@ export class CustomersService {
     orgId: string,
     customerHashId: string,
     canDetokenize = false,
+    bearerToken?: string,
   ): Promise<CustomerResponseDto> {
     const customer = await this.customerRepository.findOne({
       where: { hashId: customerHashId, organizationHashId: orgId },
@@ -75,11 +76,11 @@ export class CustomersService {
     };
 
     // Detokenize PII only if caller has privilege
-    if (canDetokenize) {
+    if (canDetokenize && bearerToken) {
       try {
-        response.email = await this.piiVaultClient.detokenize(customer.emailToken);
+        response.email = await this.piiVaultClient.detokenize(customer.emailToken, bearerToken);
         if (customer.phoneToken) {
-          response.phone = await this.piiVaultClient.detokenize(customer.phoneToken);
+          response.phone = await this.piiVaultClient.detokenize(customer.phoneToken, bearerToken);
         }
       } catch (error) {
         this.logger.warn('PII detokenization failed, returning response without PII', error);
@@ -93,14 +94,14 @@ export class CustomersService {
    * Create a new customer within an organization.
    * Tokenizes raw PII (email, phone) via the PII Vault before storage.
    */
-  async create(orgId: string, dto: CreateCustomerDto): Promise<CustomerResponseDto> {
+  async create(orgId: string, dto: CreateCustomerDto, bearerToken: string): Promise<CustomerResponseDto> {
     const hashId = this.hashIdService.generate('CUS');
 
     // Tokenize PII via vault — raw values never stored in our DB
-    const emailToken = await this.piiVaultClient.tokenize('email', dto.email);
+    const emailToken = await this.piiVaultClient.tokenize('email', dto.email, orgId, bearerToken);
     let phoneToken: string | null = null;
     if (dto.phone) {
-      phoneToken = await this.piiVaultClient.tokenize('phone', dto.phone);
+      phoneToken = await this.piiVaultClient.tokenize('phone', dto.phone, orgId, bearerToken);
     }
 
     const customer = this.customerRepository.create({
@@ -144,6 +145,7 @@ export class CustomersService {
     orgId: string,
     customerHashId: string,
     dto: UpdateCustomerDto,
+    bearerToken: string,
   ): Promise<CustomerResponseDto> {
     const customer = await this.customerRepository.findOne({
       where: { hashId: customerHashId, organizationHashId: orgId },
@@ -164,10 +166,10 @@ export class CustomersService {
 
     // Re-tokenize PII if changed
     if (dto.email !== undefined) {
-      customer.emailToken = await this.piiVaultClient.tokenize('email', dto.email);
+      customer.emailToken = await this.piiVaultClient.tokenize('email', dto.email, orgId, bearerToken);
     }
     if (dto.phone !== undefined) {
-      customer.phoneToken = await this.piiVaultClient.tokenize('phone', dto.phone);
+      customer.phoneToken = await this.piiVaultClient.tokenize('phone', dto.phone, orgId, bearerToken);
     }
 
     await this.customerRepository.save(customer);
