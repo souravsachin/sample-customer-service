@@ -5,6 +5,7 @@ import { CustomersModule } from './modules/customers.module';
 import { AuthModule } from './modules/auth.module';
 import { EventsModule } from './modules/events.module';
 import { Customer } from './models/entities/customer.entity';
+import { HealthController } from './controllers/health.controller';
 
 @Module({
   imports: [
@@ -31,5 +32,6 @@ import { Customer } from './models/entities/customer.entity';
     EventsModule,
     CustomersModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule {}
