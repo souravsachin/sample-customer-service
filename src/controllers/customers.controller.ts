@@ -19,6 +19,8 @@ import { UpdateCustomerDto } from '../models/dto/update-customer.dto';
 import { CustomerResponseDto } from '../models/dto/customer-response.dto';
 import { JwtAuthGuard } from '../middleware/jwt-auth.guard';
 import { NamespaceGuard } from '../middleware/namespace.guard';
+import { ZorbitPrivilegeGuard } from '../middleware/zorbit-privilege.guard';
+import { RequirePrivileges } from '../middleware/decorators';
 import { JwtPayload } from '../middleware/jwt.strategy';
 
 /**
@@ -37,11 +39,12 @@ function extractToken(authHeader?: string): string {
 @ApiTags('customers')
 @ApiBearerAuth()
 @Controller('api/v1/O/:orgId/customers')
-@UseGuards(JwtAuthGuard, NamespaceGuard)
+@UseGuards(JwtAuthGuard, NamespaceGuard, ZorbitPrivilegeGuard)
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
   @Get()
+  @RequirePrivileges('customer.read')
   @ApiOperation({ summary: 'List customers', description: 'List all customers in an organization.' })
   @ApiParam({ name: 'orgId', description: 'Organization short hash ID', example: 'O-92AF' })
   @ApiResponse({ status: 200, description: 'List of customers returned.' })
@@ -50,6 +53,7 @@ export class CustomersController {
   }
 
   @Post()
+  @RequirePrivileges('customer.create')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create customer', description: 'Create a new customer in an organization. PII fields are tokenized via the PII Vault.' })
   @ApiParam({ name: 'orgId', description: 'Organization short hash ID', example: 'O-92AF' })
@@ -63,6 +67,7 @@ export class CustomersController {
   }
 
   @Get(':customerId')
+  @RequirePrivileges('customer.read')
   @ApiOperation({ summary: 'Get customer', description: 'Get a customer by hashId. PII fields are only included if the caller has the pii:detokenize privilege.' })
   @ApiParam({ name: 'orgId', description: 'Organization short hash ID', example: 'O-92AF' })
   @ApiParam({ name: 'customerId', description: 'Customer short hash ID', example: 'CUS-81F3' })
@@ -79,6 +84,7 @@ export class CustomersController {
   }
 
   @Put(':customerId')
+  @RequirePrivileges('customer.update')
   @ApiOperation({ summary: 'Update customer', description: 'Update a customer. PII fields will be re-tokenized via the PII Vault.' })
   @ApiParam({ name: 'orgId', description: 'Organization short hash ID', example: 'O-92AF' })
   @ApiParam({ name: 'customerId', description: 'Customer short hash ID', example: 'CUS-81F3' })
@@ -94,6 +100,7 @@ export class CustomersController {
   }
 
   @Delete(':customerId')
+  @RequirePrivileges('customer.delete')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete customer', description: 'Delete a customer from an organization.' })
   @ApiParam({ name: 'orgId', description: 'Organization short hash ID', example: 'O-92AF' })
