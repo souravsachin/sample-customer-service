@@ -1,0 +1,5 @@
+{
+  "tiers": [
+    { "name": "Free reference module", "monthlyPrice": null, "features": ["Reference / teaching only", "Not for production"] }
+  ]
+}

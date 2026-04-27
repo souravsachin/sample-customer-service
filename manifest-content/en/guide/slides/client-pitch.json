@@ -1,0 +1,13 @@
+{
+  "deck": [
+    {
+      "title": "What is sample-customer-service",
+      "body":  "A reference module showing the canonical Zorbit patterns. Use it as a starting point.",
+      "narration": {
+        "audioSrc": "./audio/client-pitch/0.mp3",
+        "text":     "Sample customer service is a reference module showing the canonical Zorbit patterns. New module authors copy from it as a starting point.",
+        "duration": 9
+      }
+    }
+  ]
+}

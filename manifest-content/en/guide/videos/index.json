@@ -1,0 +1,4 @@
+{
+  "playlists": { "demo-tour": { "label": "Demo tour", "audience": "prospect", "$src": "./demo-tour.json" } },
+  "default": "demo-tour"
+}

@@ -1,0 +1,6 @@
+{
+  "links": [
+    { "label": "Module template guide", "href": "/docs/sample/template-guide.md", "kind": "doc" },
+    { "label": "OpenAPI spec",          "href": "/api/sample/api/v1/G/openapi.json", "kind": "api" }
+  ]
+}

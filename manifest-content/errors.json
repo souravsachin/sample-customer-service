@@ -1,0 +1,4 @@
+{
+  "SAMPLE_CUST_NOT_FOUND": { "message": "Customer not found.", "remedy": "Check the customer ID." },
+  "SAMPLE_CUST_DUP":       { "message": "Customer with this email exists.", "remedy": "Use a different email." }
+}

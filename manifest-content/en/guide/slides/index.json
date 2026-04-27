@@ -1,0 +1,6 @@
+{
+  "decks": {
+    "client-pitch": { "label": "Client pitch", "audience": "prospect", "$src": "./client-pitch.json" }
+  },
+  "default": "client-pitch"
+}

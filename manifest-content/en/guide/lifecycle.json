@@ -1,0 +1,8 @@
+{
+  "phases": [
+    { "name": "Register",  "description": "POST /customers — creates row + emits sample.customer.created" },
+    { "name": "Read",      "description": "GET /customers/:id — returns row" },
+    { "name": "Update",    "description": "PUT /customers/:id — emits sample.customer.updated" },
+    { "name": "Delete",    "description": "DELETE /customers/:id — soft-delete + emit" }
+  ]
+}

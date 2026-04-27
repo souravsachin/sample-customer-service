@@ -1,0 +1,11 @@
+{
+  "pageId": "PG-SAMPLE-CUST",
+  "dataSource": { "beRoute": "/api/sample/api/v1/O/{org_id}/customers", "scope": "O", "pageSize": 25 },
+  "columns": [
+    { "key": "hashId",        "label": "Customer ID",   "type": "id" },
+    { "key": "displayName",   "label": "Name",          "type": "text", "sortable": true, "filterable": true },
+    { "key": "emailToken",    "label": "Email (PII)",   "type": "text" },
+    { "key": "createdAt",     "label": "Created",       "type": "datetime", "format": "relative", "sortable": true }
+  ],
+  "defaultSort": [{ "field": "createdAt", "order": "desc" }]
+}
