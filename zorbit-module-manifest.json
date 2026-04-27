@@ -17,10 +17,10 @@
   "version": "0.1.0",
   "moduleId": "sample-customer-service",
   "placement": {
-    "scaffold": "business",
-    "sortOrder": 100,
-    "capabilityArea": "Sample-Customer-Service",
-    "scaffoldSortOrder": 30
+    "scaffold": "developer_center",
+    "scaffoldSortOrder": 70,
+    "capabilityArea": "code_samples",
+    "sortOrder": 100
   },
   "type": "app",
   "moduleSlug": "sample-customer-service",
